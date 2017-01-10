@@ -9,14 +9,13 @@ node_modules
 *.js~
 *.ht~
 *.js.map
+*.js
 *.d.ts
-x
-y
-z
+.vscode
+src/biz/**/*.js
 src/app/users/items.js~
 dist/build/app.js
 dist/build/app.js.map
-src/app/tasks/x.txt
 dist/build
 build
 platforms

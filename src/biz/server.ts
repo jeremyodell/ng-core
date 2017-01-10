@@ -96,8 +96,12 @@ export class BizServer {
     this.app.use('/client', express.static(path.join(ROOT, 'dist', 'client')));
     
     if (!globals.disableServerSideRender) {
-      for (let route of this.config.routes) {
-        this.app.get(route, ngPage(this.config.apps['root'], 'index', '/'));
+      if (this.config.routes) {
+        for (let route of this.config.routes) {
+          this.app.get(route, ngPage(this.config.apps['root'], 'index', '/'));
+        }
+      } else {
+        this.app.get('/', ngPage(this.config.apps['root'], 'index', '/'));
       }
     }
 

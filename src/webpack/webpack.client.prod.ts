@@ -1,13 +1,14 @@
-var webpack = require('webpack');
-var webpackMerge = require('webpack-merge');
-var commonConfig = require('./webpack.common.js');
-var helpers = require('./helpers');
+import { WebpackHelper } from './helpers';
+import { commonConfig } from './webpack.common';
+import * as webpack from 'webpack';
+const webpackMerge = require('webpack-merge');;
 
-const CopyWebpackPlugin = require('copy-webpack-plugin'),
-  UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin'),
-  DefinePlugin = require('webpack/lib/DefinePlugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const DefinePlugin = require('webpack/lib/DefinePlugin');
+const helpers = WebpackHelper.getInstance();
 
-module.exports = webpackMerge(commonConfig, {
+export var clientConfig = webpackMerge(commonConfig, {
   target: 'web',
 
   entry: {

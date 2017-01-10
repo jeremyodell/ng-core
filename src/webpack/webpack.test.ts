@@ -1,6 +1,7 @@
-var helpers = require('./helpers');
+import { WebpackHelper } from './helpers';
+const helpers = WebpackHelper.getInstance();
 
-module.exports = {
+export var webpackConfig = {
   devtool: 'inline-source-map',
 
   resolve: {
@@ -24,12 +25,12 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: helpers.root('src', 'app'),
+        exclude: helpers.root('src'),
         loader: 'null'
       },
       {
         test: /\.css$/,
-        include: helpers.root('src', 'app'),
+        include: helpers.root('src'),
         loader: 'raw'
       }
     ]

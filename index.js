@@ -1,1 +1,6 @@
-export * from './src/core'
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(require('./src/biz'));
+//# sourceMappingURL=index.js.map

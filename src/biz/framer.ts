@@ -1,16 +1,18 @@
 import { BizNgModule } from './ng-module';
+import { BizFramerConfig } from './framer-config';
 
-export class BizFraming<C> {
+export class BizFramer<C> {
 
   // ========================================
   // constructor
   // ========================================
 
-  public constructor(public config?: C) {}
+  public constructor(public config?: C & BizFramerConfig<any>) {}
 
   // ========================================
   // public methods
   // ========================================
 
-  public build(bizNgModule: BizNgModule): void {}
+  public frame(bizNgModule: BizNgModule): void {
+  }
 }

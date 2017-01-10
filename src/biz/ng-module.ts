@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 import { ModuleWithProviders, NgModuleFactory, NgModule, Component } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule }  from '@angular/forms';
 import { Route, Routes, RouterModule, Resolve, ResolveData, Data, LoadChildren } from '@angular/router';
@@ -8,21 +9,20 @@ import { HttpModule } from '@angular/http';
 //import { MaterialModule } from '@angular/material';
 
 import { BizContainerComponent } from './components/biz-container.component';
+import { BizFramer } from './framer';
 import { BizRootComponent } from './components/biz-root.component';
 
-import { BizFraming } from './framing';
-
-let universalModule: any;
+let universalModule: any = BrowserModule;
 
 /**
- * 
+ *
  */
 export function setUniversalModule(module: any): void {
   universalModule = module;
 }
 
 /**
- * 
+ *
  */
 export class BizNgModule {
 
@@ -38,8 +38,6 @@ export class BizNgModule {
 
   private _data: any = {};
 
-  private _framing: BizFraming<any>;
-
   private _ngModule: NgModule;
 
   private _root: boolean = false;
@@ -47,6 +45,8 @@ export class BizNgModule {
   private _rootComponent: any;
 
   private _route: Route;
+
+  private isFraming: Boolean = false;
 
   // ========================================
   // constructor
@@ -63,7 +63,7 @@ export class BizNgModule {
   public ngModule(ngModule?: NgModule): BizNgModule {
     if (this._ngModule) {
       if (ngModule) {
-        _.merge(this._ngModule, ngModule); 
+        _.merge(this._ngModule, ngModule);
       }
     } else {
       this._ngModule = ngModule || {};
@@ -140,15 +140,6 @@ export class BizNgModule {
   }
 
   /**
-   * Calls framing.build(this)
-   */
-  public framing(framing: BizFraming<any>): BizNgModule {
-    this._framing = framing;
-
-    return this;
-  }
-
-  /**
    * Builds @NgModule() config in the following order:
    * - Defaults
    * - Scaffold
@@ -157,16 +148,28 @@ export class BizNgModule {
    * - Component
    * - Route
    */
-  public build(): NgModule {
-    this.buildDefaults();
-    this.buildFraming();
-    this.buildRoot();        
-    this.buildContainers();
-    this.buildComponent();
-    this.buildChildren();
-    this.buildRoute();
+  public frame(framers?: BizFramer<any> | Array<BizFramer<any>>): NgModule {
+    if (this.isFraming) {
+      this.buildFramers(framers);
+    } else {
+      this.isFraming = true;
+
+      this.buildDefaults();
+      this.buildFramers(framers);
+      this.buildRoot();
+      this.buildContainers();
+      this.buildComponent();
+      this.buildChildren();
+      this.buildRoute();
+
+      this.isFraming = false;
+    }
 
     return this._ngModule;
+  }
+
+  public build(framers?: BizFramer<any> | Array<BizFramer<any>>): NgModule {
+    return this.frame(framers);
   }
 
   // ========================================
@@ -182,6 +185,7 @@ export class BizNgModule {
     m.exports = m.exports || [];
     m.providers = m.providers || [];
     m.bootstrap = m.bootstrap || [];
+    m.entryComponents = m.entryComponents || [];
   }
 
   private buildRoot(): void {
@@ -214,11 +218,15 @@ export class BizNgModule {
     }
   }
 
-  private buildFraming(): void {
-    let m: NgModule = this._ngModule;
-
-    if (this._framing) {
-      this._framing.build(this);
+  private buildFramers(framers: BizFramer<any> | Array<BizFramer<any>>): void {
+    if (framers) {
+      if (framers instanceof Array) {
+        for (let framer of framers) {
+          framer.frame(this);
+        }
+      } else {
+        framers.frame(this);
+      }
     }
   }
 
@@ -232,8 +240,8 @@ export class BizNgModule {
         return this._containers[key];
       });
 
-      m.exports = (m.exports || []).concat(containerComponents);
-      m.declarations = (m.declarations || []).concat(containerComponents);
+      m.exports = m.exports.concat(containerComponents);
+      m.declarations = m.declarations.concat(containerComponents);
     }
   }
 
@@ -254,7 +262,7 @@ export class BizNgModule {
       let newRoute: Route = {
         data: {}
       };
-      
+
       if (r.path || r.path == "") newRoute.path = r.path;
       if (r.pathMatch) newRoute.pathMatch = r.pathMatch;
       if (r.component) newRoute.component = r.component;

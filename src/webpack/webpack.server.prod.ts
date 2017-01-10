@@ -1,14 +1,15 @@
-var webpackMerge = require('webpack-merge');
-var path = require('path');
-var commonConfig = require('./webpack.common.js');
-var helpers = require('./helpers');
+const webpackMerge = require('webpack-merge');;
+import * as path from 'path';
+import { commonConfig } from './webpack.common';
+import { WebpackHelper } from './helpers';
+const helpers = WebpackHelper.getInstance();
 
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 /**
  * Webpack Constants
  */
 
-module.exports = webpackMerge(commonConfig, {
+export var serverConfig = webpackMerge(commonConfig, {
   target: 'node',
 
   entry: {
@@ -61,7 +62,6 @@ module.exports = webpackMerge(commonConfig, {
     process: true,
     Buffer: true,
     crypto: 'empty',
-    process: false,
     module: false,
     clearImmediate: false,
     setImmediate: false
@@ -73,18 +73,6 @@ function includeClientPackages(packages) {
     if (packages && packages.indexOf(request) !== -1) {
       return cb();
     }
-    return checkNodeImport(context, request, cb);
+    return helpers.checkNodeImport(context, request, cb);
   };
-}
-// Helpers
-function checkNodeImport(context, request, cb) {
-  if (!path.isAbsolute(request) && request.charAt(0) !== '.') {
-    cb(null, 'commonjs ' + request); return;
-  }
-  cb();
-}
-
-function root(args) {
-  args = Array.prototype.slice.call(arguments, 0);
-  return path.join.apply(path, [__dirname].concat(args));
 }

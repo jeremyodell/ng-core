@@ -1,6 +1,6 @@
-var webpackConfig = require('./webpack.test');
+import { webpackConfig } from './webpack.test';
 
-module.exports = function (config) {
+export var karmaConfig = function (config) {
   var _config = {
     basePath: '',
 

@@ -1,9 +1,11 @@
-const webpack = require('webpack');
-const helpers = require('./helpers');
+// const webpack = require('webpack');
+import * as webpack from 'webpack';
+import { WebpackHelper } from './helpers';
 
+const helpers = WebpackHelper.getInstance();
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
-module.exports = {
+export var commonConfig = {
   resolve: {
     extensions: ['.js', '.ts', '.json'],
   },

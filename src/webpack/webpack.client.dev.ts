@@ -1,14 +1,12 @@
-var webpack = require('webpack');
-var webpackMerge = require('webpack-merge');
-var commonConfig = require('./webpack.common.js');
-var helpers = require('./helpers');
-var path = require('path');
+import * as webpack from 'webpack';
+const webpackMerge = require('webpack-merge');;
+import { commonConfig } from './webpack.common';
+import { WebpackHelper } from './helpers';
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const helpers = WebpackHelper.getInstance();
 
-//var bizConfig = require(path.join(process.cwd(), 'biz.config.ts'));
-
-module.exports = webpackMerge(commonConfig, {
+export var clientConfig = webpackMerge(commonConfig, {
   target: 'web',
 
   entry: {

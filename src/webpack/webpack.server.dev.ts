@@ -1,13 +1,13 @@
-var webpackMerge = require('webpack-merge');
-var path = require('path');
-var commonConfig = require('./webpack.common.js');
-var helpers = require('./helpers');
-
+const webpackMerge = require('webpack-merge');;
+import * as path from 'path';
+import { commonConfig } from './webpack.common';
+import { WebpackHelper } from './helpers';
+const helpers = WebpackHelper.getInstance();
 /**
  * Webpack Constants
  */
 
-module.exports = webpackMerge(commonConfig, {
+export var serverConfig = webpackMerge(commonConfig, {
   target: 'node',
 
   entry: {
@@ -42,13 +42,6 @@ function includeClientPackages(packages) {
     if (packages && packages.indexOf(request) !== -1) {
       return cb();
     }
-    return checkNodeImport(context, request, cb);
+    return helpers.checkNodeImport(context, request, cb);
   };
-}
-// Helpers
-function checkNodeImport(context, request, cb) {
-  if (!path.isAbsolute(request) && request.charAt(0) !== '.') {
-    cb(null, 'commonjs ' + request); return;
-  }
-  cb();
 }
