@@ -1,16 +1,16 @@
 import * as _ from 'lodash';
 
-import { ModuleWithProviders, NgModuleFactory, NgModule, Component } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { FormsModule }  from '@angular/forms';
-import { Route, Routes, RouterModule, Resolve, ResolveData, Data, LoadChildren } from '@angular/router';
+import { Component, ModuleWithProviders, NgModule, NgModuleFactory } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-//import { MaterialModule } from '@angular/material';
+import { BrowserModule } from '@angular/platform-browser';
+import { Data, LoadChildren, Resolve, ResolveData, Route, RouterModule, Routes } from '@angular/router';
+// import { MaterialModule } from '@angular/material';
 
 import { BizContainerComponent } from './components/biz-container.component';
-import { BizFramer } from './framer';
 import { BizRootComponent } from './components/biz-root.component';
+import { BizFramer } from './framer';
 
 let universalModule: any = BrowserModule;
 
@@ -30,7 +30,7 @@ export class BizNgModule {
   // private properties
   // ========================================
 
-  private _children: Array<any>;
+  private _children: any[];
 
   private _component: any;
 
@@ -76,7 +76,7 @@ export class BizNgModule {
    * Adds to imports
    * Adds to route
    */
-  public children(children: Array<any>): BizNgModule {
+  public children(children: any[]): BizNgModule {
     this._children = children;
 
     return this;
@@ -148,7 +148,7 @@ export class BizNgModule {
    * - Component
    * - Route
    */
-  public frame(framers?: BizFramer<any> | Array<BizFramer<any>>): NgModule {
+  public frame(framers?: BizFramer<any> | BizFramer<any>[]): NgModule {
     if (this.isFraming) {
       this.buildFramers(framers);
     } else {
@@ -168,7 +168,7 @@ export class BizNgModule {
     return this._ngModule;
   }
 
-  public build(framers?: BizFramer<any> | Array<BizFramer<any>>): NgModule {
+  public build(framers?: BizFramer<any> | BizFramer<any>[]): NgModule {
     return this.frame(framers);
   }
 
@@ -192,33 +192,33 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
     let defaultRoute: any = {
       path: '',
-      pathMatch: 'full'
+      pathMatch: 'full',
     };
 
     if (this._root) {
       m.imports = m.imports.concat([
         universalModule,
-        FormsModule//,
-        //MaterialModule.forRoot()
+        FormsModule,
+        // MaterialModule.forRoot().
       ]);
 
-      m.declarations = m.declarations.concat([this._rootComponent]);
-      m.bootstrap = m.bootstrap.concat([this._rootComponent]);
+      m.declarations = m.declarations.concat([ this._rootComponent ]);
+      m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
 
       if (this._route) {
         _.defaults(this._route, defaultRoute);
       } else {
-        this._route = defaultRoute
+        this._route = defaultRoute;
       }
     } else {
       m.imports = m.imports.concat([
-        CommonModule//,
-        //MaterialModule
+        CommonModule,
+        // MaterialModule,
       ]);
     }
   }
 
-  private buildFramers(framers: BizFramer<any> | Array<BizFramer<any>>): void {
+  private buildFramers(framers: BizFramer<any> | BizFramer<any>[]): void {
     if (framers) {
       if (framers instanceof Array) {
         for (let framer of framers) {
@@ -234,7 +234,7 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
 
     if (this._containers) {
-      this._data['bizContainers'] = this._containers;
+      this._data.bizContainers = this._containers;
 
       let containerComponents = Object.keys(this._containers).map((key: any) => {
         return this._containers[key];
@@ -260,40 +260,40 @@ export class BizNgModule {
 
     if (r) {
       let newRoute: Route = {
-        data: {}
+        data: {},
       };
 
-      if (r.path || r.path == "") newRoute.path = r.path;
-      if (r.pathMatch) newRoute.pathMatch = r.pathMatch;
-      if (r.component) newRoute.component = r.component;
-      if (r.outlet) newRoute.outlet = r.outlet;
-      if (r.canActivate) newRoute.canActivate = r.canActivate;
-      if (r.canActivateChild) newRoute.canActivateChild = r.canActivateChild;
-      if (r.canDeactivate) newRoute.canDeactivate = r.canDeactivate;
-      if (r.canLoad) newRoute.canLoad = r.canLoad;
-      if (r.data) _.assign(newRoute.data, r.data);
-      if (this._data) _.assign(newRoute.data, this._data);
-      if (r.resolve) newRoute.resolve = r.resolve;
-      if (r.children) newRoute.children = r.children;
-      if (r.loadChildren) newRoute.loadChildren = r.loadChildren;
-      if (r.redirectTo) newRoute.redirectTo = r.redirectTo;
+      if (r.path || r.path === '') { newRoute.path = r.path; }
+      if (r.pathMatch) { newRoute.pathMatch = r.pathMatch; }
+      if (r.component) { newRoute.component = r.component; }
+      if (r.outlet) { newRoute.outlet = r.outlet; }
+      if (r.canActivate) { newRoute.canActivate = r.canActivate; }
+      if (r.canActivateChild) { newRoute.canActivateChild = r.canActivateChild; }
+      if (r.canDeactivate) { newRoute.canDeactivate = r.canDeactivate; }
+      if (r.canLoad) { newRoute.canLoad = r.canLoad; }
+      if (r.data) { _.assign(newRoute.data, r.data); }
+      if (this._data) { _.assign(newRoute.data, this._data); }
+      if (r.resolve) { newRoute.resolve = r.resolve; }
+      if (r.children) { newRoute.children = r.children; }
+      if (r.loadChildren) { newRoute.loadChildren = r.loadChildren; }
+      if (r.redirectTo) { newRoute.redirectTo = r.redirectTo; }
 
       if (newRoute.outlet) {
-        delete newRoute['redirectTo'];
+        delete newRoute.redirectTo;
       }
 
       if (newRoute.redirectTo) {
-        delete newRoute['component'];
+        delete newRoute.component;
       }
 
-      let routes: Routes = [newRoute];
+      let routes: Routes = [ newRoute ];
       let routingProviders: any[] = newRoute.resolve ? Object.keys(newRoute.resolve).map((k) => {
-        return newRoute.resolve[k]
+        return newRoute.resolve[k];
       }) : [];
       let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(routes) : RouterModule.forChild(routes);
 
-      m.imports = m.imports.concat([routing]);
-      m.providers = m.providers.concat([routingProviders]);
+      m.imports = m.imports.concat([ routing ]);
+      m.providers = m.providers.concat([ routingProviders ]);
     }
   }
 
@@ -301,7 +301,7 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
 
     if (this._component) {
-      m.declarations = m.declarations.concat([this._component]);
+      m.declarations = m.declarations.concat([ this._component ]);
 
       if (this._route) {
         this._route.component = this._component;

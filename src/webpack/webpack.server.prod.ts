@@ -1,7 +1,7 @@
-const webpackMerge = require('webpack-merge');;
+const webpackMerge = require('webpack-merge');
 import * as path from 'path';
-import { commonConfig } from './webpack.common';
 import { WebpackHelper } from './helpers';
+import { commonConfig } from './webpack.common';
 const helpers = WebpackHelper.getInstance();
 
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
@@ -9,11 +9,11 @@ const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
  * Webpack Constants
  */
 
-export var serverConfig = webpackMerge(commonConfig, {
+export let serverConfig = webpackMerge(commonConfig, {
   target: 'node',
 
   entry: {
-    'server': './biz.server',
+    server: './biz.server',
   },
 
   output: {
@@ -21,11 +21,11 @@ export var serverConfig = webpackMerge(commonConfig, {
     path: helpers.root('dist/server'),
     filename: '[name].js',
     sourceMapFilename: '[name].[chunkhash].bundle.map',
-    chunkFilename: '[id].[chunkhash].chunk.js'
+    chunkFilename: '[id].[chunkhash].chunk.js',
   },
   module: {
     rules: [
-      { enforce: 'pre', test: /angular\/material/, loader: "imports-loader?window=>global" },
+      { enforce: 'pre', test: /angular\/material/, loader: 'imports-loader?window=>global' },
     ],
   },
   plugins: [
@@ -45,15 +45,15 @@ export var serverConfig = webpackMerge(commonConfig, {
       // comments: true, //debug
 
 
-      beautify: false, //prod
-      mangle: { screw_ie8 : true, keep_fnames: true }, //prod
-      compress: { screw_ie8: true }, //prod
-      comments: false //prod
-    })
+      beautify: false, // prod
+      mangle: { screw_ie8 : true, keep_fnames: true }, // prod
+      compress: { screw_ie8: true }, // prod
+      comments: false, // prod
+    }),
   ],
   externals: includeClientPackages([
     // include these client packages so we can transform their source with webpack loaders
-    '@angular/material'
+    '@angular/material',
   ]),
   node: {
     global: true,
@@ -64,12 +64,12 @@ export var serverConfig = webpackMerge(commonConfig, {
     crypto: 'empty',
     module: false,
     clearImmediate: false,
-    setImmediate: false
-  }
+    setImmediate: false,
+  },
 });
 
-function includeClientPackages(packages) {
-  return function(context, request, cb) {
+function includeClientPackages(packages: any): any {
+  return (context, request, cb) => {
     if (packages && packages.indexOf(request) !== -1) {
       return cb();
     }

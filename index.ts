@@ -1,1 +1,1 @@
-export * from './src/biz'
+export * from './src/biz';

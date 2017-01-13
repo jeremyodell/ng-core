@@ -54,13 +54,13 @@ export class BizServer {
   // ========================================
 
   public start(): BizServer {
-    this.app.get('*', function(req, res) {
+    this.app.get('*', (req, res) => {
       res.setHeader('Content-Type', 'application/json');
-      var pojo = { status: 404, message: 'No Content' };
-      var json = JSON.stringify(pojo, null, 2);
+      let pojo = { status: 404, message: 'No Content' };
+      let json = JSON.stringify(pojo, null, 2);
       res.status(404).send(json);
     });
-    
+
     this.server = this.app.listen(process.env.PORT || 8888, () => {
       console.log(`Listening on: http://localhost:${this.server.address().port}`);
     });
@@ -92,16 +92,20 @@ export class BizServer {
     // Serve static files
     this.app.use(express.static(path.join(ROOT, 'public')));
     this.app.use('/public', express.static(path.join(ROOT, 'public')));
-    
+
     this.app.use('/client', express.static(path.join(ROOT, 'dist', 'client')));
-    
+
     if (!globals.disableServerSideRender) {
       if (this.config.routes) {
         for (let route of this.config.routes) {
+          /* tslint:disable:no-string-literal */
           this.app.get(route, ngPage(this.config.apps['root'], 'index', '/'));
+          /* tslint:enable:no-string-literal */
         }
       } else {
+        /* tslint:disable:no-string-literal */
         this.app.get('/', ngPage(this.config.apps['root'], 'index', '/'));
+        /* tslint:enable:no-string-literal */
       }
     }
 
@@ -112,10 +116,10 @@ export class BizServer {
           res,
           // time: true, // use this to determine what part of your app is slow only in development
           preboot: true,
-          baseUrl: baseUrl,
+          baseUrl,
           requestUrl: req.originalUrl,
           originUrl: req.hostname,
-          ngModule: module
+          ngModule: module,
         });
       };
     }

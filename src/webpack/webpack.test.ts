@@ -1,38 +1,38 @@
 import { WebpackHelper } from './helpers';
 const helpers = WebpackHelper.getInstance();
 
-export var webpackConfig = {
+export let webpackConfig = {
   devtool: 'inline-source-map',
 
   resolve: {
-    extensions: ['', '.ts', '.js']
+    extensions: ['', '.ts', '.js'],
   },
 
   module: {
     loaders: [
       {
         test: /\.ts$/,
-        loaders: ['ts', 'angular2-template-loader']
+        loaders: ['ts', 'angular2-template-loader'],
       },
       {
         test: /\.html$/,
-        loader: 'html'
+        loader: 'html',
 
       },
       {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
-        loader: 'null'
+        loader: 'null',
       },
       {
         test: /\.css$/,
         exclude: helpers.root('src'),
-        loader: 'null'
+        loader: 'null',
       },
       {
         test: /\.css$/,
         include: helpers.root('src'),
-        loader: 'raw'
-      }
-    ]
-  }
-}
+        loader: 'raw',
+      },
+    ],
+  },
+};

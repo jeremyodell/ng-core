@@ -1,5 +1,5 @@
-import { BizNgModule } from './ng-module';
 import { BizFramerConfig } from './framer-config';
+import { BizNgModule } from './ng-module';
 
 export class BizFramer<C> {
 
@@ -13,6 +13,7 @@ export class BizFramer<C> {
   // public methods
   // ========================================
 
-  public frame(bizNgModule: BizNgModule): void {
-  }
+  /* tslint:disable:no-empty */
+  public frame(bizNgModule: BizNgModule): void {}
+  /* tslint:enable:no-empty */
 }

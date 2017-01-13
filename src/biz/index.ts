@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 
 import { BizConfig } from './config';
-import { BizNgModule } from './ng-module';
 import { BizFramer } from './framer';
 import { BizFramerConfig } from './framer-config';
+import { BizNgModule } from './ng-module';
 
 export {
   BizConfig,
-  BizNgModule,
   BizFramer,
-  BizFramerConfig
+  BizFramerConfig,
+  BizNgModule,
 };
 
 export class Biz {

@@ -2,4 +2,4 @@ export class BizGlobals {
   disableServerSideRender: boolean;
 }
 
-export var globals: BizGlobals = new BizGlobals();
+export let globals: BizGlobals = new BizGlobals();
