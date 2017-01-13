@@ -98,10 +98,14 @@ export class BizServer {
     if (!globals.disableServerSideRender) {
       if (this.config.routes) {
         for (let route of this.config.routes) {
-          this.app.get(route, ngPage(this.config.apps.root, 'index', '/'));
+          /* tslint:disable:no-string-literal */
+          this.app.get(route, ngPage(this.config.apps['root'], 'index', '/'));
+          /* tslint:enable:no-string-literal */
         }
       } else {
-        this.app.get('/', ngPage(this.config.apps.root, 'index', '/'));
+        /* tslint:disable:no-string-literal */
+        this.app.get('/', ngPage(this.config.apps['root'], 'index', '/'));
+        /* tslint:enable:no-string-literal */
       }
     }
 

@@ -8,7 +8,7 @@ export class WebpackHelper {
 
   constructor() {
     if (WebpackHelper.instance) {
-      throw new Error("Error - use WebpackHelper.getInstance()");
+      throw new Error('Error - use WebpackHelper.getInstance()');
     }
   }
 
@@ -33,7 +33,7 @@ export class WebpackHelper {
     return path.join.apply(path, [this.ROOT].concat(args));
   }
 
-  public checkNodeImport(context: any, request: any, callback: Function): null {
+  public checkNodeImport(context: any, request: any, callback: Function): void {
     if (!path.isAbsolute(request) && request.charAt(0) !== '.') {
       callback(null, 'commonjs ' + request);
       return;
