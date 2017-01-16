@@ -1,6 +1,6 @@
 export interface BizConfig {
-  routes?: Array<string>;
-  apps: { [id: string] : any };
+  routes?: string[];
+  apps: { [id: string]: any };
   server?: BizServerConfig;
 }
 
