@@ -131,9 +131,11 @@ export class BizNgModule {
    */
   public route(route: Route): BizNgModule {
     if (this._route) {
-      _.assign(this._route, route);
+      if (route) {
+        _.merge(this._route, route);
+      }
     } else {
-      this._route = route;
+      this._route = route || {};
     }
 
     return this;
