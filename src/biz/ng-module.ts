@@ -42,6 +42,8 @@ export class BizNgModule {
 
   private _root: boolean = false;
 
+  private _hybrid: boolean = false;
+
   private _rootComponent: any;
 
   private _route: Route;
@@ -117,8 +119,9 @@ export class BizNgModule {
    * Adds component to bootstrap
    * Defaults route to path '', pathMatch: 'full'
    */
-  public root(rootComponent?: any): BizNgModule {
+  public root(rootComponent?: any, hybrid?: boolean): BizNgModule {
     this._root = true;
+    this._hybrid = !!hybrid;
     this._rootComponent = rootComponent || BizRootComponent;
 
     return this;
@@ -205,7 +208,11 @@ export class BizNgModule {
       ]);
 
       m.declarations = m.declarations.concat([ this._rootComponent ]);
-      m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
+      if (this._hybrid) {
+        m.entryComponents = m.entryComponents.concat([ this._rootComponent ]);
+      } else {
+        m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
+      }
 
       if (this._route) {
         _.defaults(this._route, defaultRoute);

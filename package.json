@@ -1,7 +1,7 @@
 {
   "name": "@biznas/ng-core",
   "description": "",
-  "version": "0.2.36",
+  "version": "0.2.37",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
