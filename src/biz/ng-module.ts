@@ -48,6 +48,8 @@ export class BizNgModule {
 
   private _route: Route;
 
+  private _routes: Route[];
+
   private isFraming: Boolean = false;
 
   // ========================================
@@ -65,7 +67,10 @@ export class BizNgModule {
   public ngModule(ngModule?: NgModule): BizNgModule {
     if (this._ngModule) {
       if (ngModule) {
-        _.merge(this._ngModule, ngModule);
+        _.defaults(this._ngModule, ngModule);
+        _.each(_.filter(_.keys(ngModule), (key) => { return _.isArray(ngModule[key]); }), (key) => {
+          this._ngModule[key] = this._ngModule[key].concat(ngModule[key]);
+        });
       }
     } else {
       this._ngModule = ngModule || {};
@@ -140,6 +145,12 @@ export class BizNgModule {
     } else {
       this._route = route || {};
     }
+
+    return this;
+  }
+
+  public routes(routes: Route[]): BizNgModule {
+    this._routes = routes;
 
     return this;
   }
@@ -267,7 +278,11 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
     let r: Route = this._route;
 
-    if (r) {
+    if (this._routes) {
+      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(this._routes) : RouterModule.forChild(this._routes);
+
+      m.imports = m.imports.concat([ routing ]);
+    } else if (r) {
       let newRoute: Route = {
         data: {},
       };
