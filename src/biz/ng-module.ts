@@ -11,6 +11,7 @@ import { Data, LoadChildren, Resolve, ResolveData, Route, RouterModule, Routes }
 import { BizContainerComponent } from './components/biz-container.component';
 import { BizRootComponent } from './components/biz-root.component';
 import { BizFramer } from './framer';
+import { BizRootConfig } from './root-config';
 
 let universalModule: any = BrowserModule;
 
@@ -42,7 +43,7 @@ export class BizNgModule {
 
   private _root: boolean = false;
 
-  private _hybrid: boolean = false;
+  private _rootConfig: BizRootConfig;
 
   private _rootComponent: any;
 
@@ -124,9 +125,10 @@ export class BizNgModule {
    * Adds component to bootstrap
    * Defaults route to path '', pathMatch: 'full'
    */
-  public root(rootComponent?: any, hybrid?: boolean): BizNgModule {
+  public root(rootComponent?: any, config?: BizRootConfig): BizNgModule {
     this._root = true;
-    this._hybrid = !!hybrid;
+    this._rootConfig = config;
+    _.defaults(this._rootConfig, { hybrid: false });
     this._rootComponent = rootComponent || BizRootComponent;
 
     return this;
@@ -219,7 +221,7 @@ export class BizNgModule {
       ]);
 
       m.declarations = m.declarations.concat([ this._rootComponent ]);
-      if (this._hybrid) {
+      if (this._rootConfig.hybrid) {
         m.entryComponents = m.entryComponents.concat([ this._rootComponent ]);
       } else {
         m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
@@ -279,7 +281,7 @@ export class BizNgModule {
     let r: Route = this._route;
 
     if (this._routes) {
-      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(this._routes) : RouterModule.forChild(this._routes);
+      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(this._routes, this._rootConfig.extraRouterOptions) : RouterModule.forChild(this._routes);
 
       m.imports = m.imports.concat([ routing ]);
     } else if (r) {
@@ -314,7 +316,7 @@ export class BizNgModule {
       let routingProviders: any[] = newRoute.resolve ? Object.keys(newRoute.resolve).map((k) => {
         return newRoute.resolve[k];
       }) : [];
-      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(routes) : RouterModule.forChild(routes);
+      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(routes, this._rootConfig.extraRouterOptions) : RouterModule.forChild(routes);
 
       m.imports = m.imports.concat([ routing ]);
       m.providers = m.providers.concat([ routingProviders ]);
