@@ -64,8 +64,8 @@
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-variable": true,
-    "no-empty": true,
-    "no-eval": false, // TODO(lint) should this be used? two places eval() is used right now.
+    "no-empty": false,
+    "no-eval": true,
     "no-for-in-array": false, // TODO(lint) require tslint type checking which isn't working
     "no-invalid-this": true,
     "no-null-keyword": false,
@@ -77,7 +77,7 @@
     "no-unused-new": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
-    "radix": false, // TODO(lint) should be turned on when the one instance of it fixed
+    "radix": true,
     "restrict-plus-operands": false, // TODO(lint) require tslint type checking which isn't working
     "switch-default": false,
     "triple-equals": [ true, "allow-undefined-check" ],
