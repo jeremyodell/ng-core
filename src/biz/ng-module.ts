@@ -11,7 +11,8 @@ import { Data, LoadChildren, Resolve, ResolveData, Route, RouterModule, Routes }
 import { BizContainerComponent } from './components/biz-container.component';
 import { BizRootComponent } from './components/biz-root.component';
 import { BizFramer } from './framer';
-import { BizRootConfig } from './root-config';
+import { BizRootComponentConfig } from './root-component-config';
+import { BizRouteConfig } from './route-config';
 
 let universalModule: any = BrowserModule;
 
@@ -43,13 +44,15 @@ export class BizNgModule {
 
   private _root: boolean = false;
 
-  private _rootConfig: BizRootConfig;
+  private _rootComponentConfig: BizRootComponentConfig;
 
   private _rootComponent: any;
 
   private _route: Route;
 
   private _routes: Route[];
+
+  private _routeConfig: BizRouteConfig;
 
   private isFraming: Boolean = false;
 
@@ -125,10 +128,10 @@ export class BizNgModule {
    * Adds component to bootstrap
    * Defaults route to path '', pathMatch: 'full'
    */
-  public root(rootComponent?: any, config?: BizRootConfig): BizNgModule {
+  public root(rootComponent?: any, config?: BizRootComponentConfig): BizNgModule {
     this._root = true;
-    this._rootConfig = config;
-    _.defaults(this._rootConfig, { hybrid: false });
+    this._rootComponentConfig = config || {};
+    _.defaults(this._rootComponentConfig, { hybrid: false });
     this._rootComponent = rootComponent || BizRootComponent;
 
     return this;
@@ -139,7 +142,7 @@ export class BizNgModule {
    * Adds RouterModule.forRoot(routes) or RouterModule.forChild(routes) to imports
    * Adds all resolve services as providers
    */
-  public route(route: Route): BizNgModule {
+  public route(route: Route, config?: BizRouteConfig): BizNgModule {
     if (this._route) {
       if (route) {
         _.merge(this._route, route);
@@ -148,11 +151,29 @@ export class BizNgModule {
       this._route = route || {};
     }
 
+    if (this._routeConfig) {
+      if (config) {
+        _.merge(this._routeConfig, config);
+      }
+    } else {
+      this._routeConfig = config || {};
+      _.defaults(this._routeConfig, { forRoot: false });
+    }
+
     return this;
   }
 
-  public routes(routes: Route[]): BizNgModule {
+  public routes(routes: Route[], config?: BizRouteConfig): BizNgModule {
     this._routes = routes;
+
+    if (this._routeConfig) {
+      if (config) {
+        _.merge(this._routeConfig, config);
+      }
+    } else {
+      this._routeConfig = config || {};
+      _.defaults(this._routeConfig, { forRoot: false });
+    }
 
     return this;
   }
@@ -221,7 +242,7 @@ export class BizNgModule {
       ]);
 
       m.declarations = m.declarations.concat([ this._rootComponent ]);
-      if (this._rootConfig.hybrid) {
+      if (this._rootComponentConfig.hybrid) {
         m.entryComponents = m.entryComponents.concat([ this._rootComponent ]);
       } else {
         m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
@@ -229,8 +250,6 @@ export class BizNgModule {
 
       if (this._route) {
         _.defaults(this._route, defaultRoute);
-      } else {
-        this._route = defaultRoute;
       }
     } else {
       m.imports = m.imports.concat([
@@ -269,7 +288,6 @@ export class BizNgModule {
 
   private buildChildren(): void {
     let m: NgModule = this._ngModule;
-    let r: Route = this._route;
 
     if (this._children) {
       m.imports = m.imports.concat(this._children);
@@ -281,9 +299,15 @@ export class BizNgModule {
     let r: Route = this._route;
 
     if (this._routes) {
-      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(this._routes, this._rootConfig.extraRouterOptions) : RouterModule.forChild(this._routes);
+      let routing: ModuleWithProviders = (this._routeConfig && this._routeConfig.forRoot) ?
+        RouterModule.forRoot(this._routes, this._routeConfig ? this._routeConfig.extraRootRouterOptions : undefined) :
+        RouterModule.forChild(this._routes);
 
       m.imports = m.imports.concat([ routing ]);
+
+      if (this._routeConfig && this._routeConfig.forRoot && !this._root) {
+        m.exports = m.exports.concat([ RouterModule ]); // export RouterModule from AppRoutingModule
+      }
     } else if (r) {
       let newRoute: Route = {
         data: {},
@@ -316,9 +340,16 @@ export class BizNgModule {
       let routingProviders: any[] = newRoute.resolve ? Object.keys(newRoute.resolve).map((k) => {
         return newRoute.resolve[k];
       }) : [];
-      let routing: ModuleWithProviders = this._root ? RouterModule.forRoot(routes, this._rootConfig.extraRouterOptions) : RouterModule.forChild(routes);
+      let routing: ModuleWithProviders = (this._routeConfig && this._routeConfig.forRoot) ?
+        RouterModule.forRoot(routes, this._routeConfig ? this._routeConfig.extraRootRouterOptions : undefined) :
+        RouterModule.forChild(routes);
 
       m.imports = m.imports.concat([ routing ]);
+
+      if (this._routeConfig && this._routeConfig.forRoot && !this._root) {
+        m.exports = m.exports.concat([ RouterModule ]); // export RouterModule from AppRoutingModule
+      }
+
       m.providers = m.providers.concat([ routingProviders ]);
     }
   }
