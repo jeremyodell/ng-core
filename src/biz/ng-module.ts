@@ -299,7 +299,7 @@ export class BizNgModule {
     let r: Route = this._route;
 
     if (this._routes) {
-      let routing: ModuleWithProviders = (this._routeConfig && this._routeConfig.forRoot) ?
+      let routing: ModuleWithProviders = this._root || (this._routeConfig && this._routeConfig.forRoot) ?
         RouterModule.forRoot(this._routes, this._routeConfig ? this._routeConfig.extraRootRouterOptions : undefined) :
         RouterModule.forChild(this._routes);
 
@@ -340,7 +340,7 @@ export class BizNgModule {
       let routingProviders: any[] = newRoute.resolve ? Object.keys(newRoute.resolve).map((k) => {
         return newRoute.resolve[k];
       }) : [];
-      let routing: ModuleWithProviders = (this._routeConfig && this._routeConfig.forRoot) ?
+      let routing: ModuleWithProviders = this._root || (this._routeConfig && this._routeConfig.forRoot) ?
         RouterModule.forRoot(routes, this._routeConfig ? this._routeConfig.extraRootRouterOptions : undefined) :
         RouterModule.forChild(routes);
 
