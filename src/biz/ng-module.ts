@@ -8,8 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { Data, LoadChildren, Resolve, ResolveData, Route, RouterModule, Routes } from '@angular/router';
 // import { MaterialModule } from '@angular/material';
 
-import { BizContainerComponent } from './components/biz-container.component';
-import { BizRootComponent } from './components/biz-root.component';
+import { BizComponentsModule, BizRootComponent } from './components';
 import { BizFramer } from './framer';
 import { BizRootComponentConfig } from './root-component-config';
 import { BizRouteConfig } from './route-config';
@@ -51,8 +50,6 @@ export class BizNgModule {
   private _rootComponentConfig: BizRootComponentConfig;
 
   private _rootComponent: any;
-
-  private _route: Route;
 
   private _routes: Route[] = [];
 
@@ -148,6 +145,13 @@ export class BizNgModule {
     return this;
   }
 
+  public declarationsAndExports(declarations: any[]): BizNgModule {
+    this.declarations(declarations);
+    this.exports(exports);
+
+    return this;
+  }
+
   public exports(exports: any[]): BizNgModule {
     this._ngModule.exports = this._ngModule.exports.concat(exports);
 
@@ -156,6 +160,13 @@ export class BizNgModule {
 
   public imports(imports: any[]): BizNgModule {
     this._ngModule.imports = this._ngModule.imports.concat(imports);
+
+    return this;
+  }
+
+  public importsAndExports(modules: any[]): BizNgModule {
+    this.imports(modules);
+    this.exports(modules);
 
     return this;
   }
@@ -171,6 +182,13 @@ export class BizNgModule {
 
   public providers(providers: any[]): BizNgModule {
     this._ngModule.providers = this._ngModule.providers.concat(providers);
+
+    return this;
+  }
+
+  public providersAndExports(providers: any[]): BizNgModule {
+    this.providers(providers);
+    this.exports(exports);
 
     return this;
   }
@@ -195,14 +213,7 @@ export class BizNgModule {
    * Adds all resolve services as providers
    */
   public route(route?: Route, config?: BizRouteConfig): BizNgModule {
-    if (this._route) {
-      if (route) {
-        _.merge(this._route, route);
-      }
-    } else {
-      this._route = route || {};
-      _.defaults(this._route, { path: '' });
-    }
+    this.getOrAddRoute(route);
 
     if (this._routeConfig) {
       if (config) {
@@ -217,16 +228,9 @@ export class BizNgModule {
   }
 
   public routes(routes: Route[], config?: BizRouteConfig): BizNgModule {
-    this._routes = this._routes.concat(routes);
-
-    if (this._routeConfig) {
-      if (config) {
-        _.merge(this._routeConfig, config);
-      }
-    } else {
-      this._routeConfig = config || {};
-      _.defaults(this._routeConfig, { forRoot: false });
-    }
+    _.each(routes, (route) => {
+      this.route(route, config);
+    });
 
     return this;
   }
@@ -301,15 +305,15 @@ export class BizNgModule {
         m.bootstrap = m.bootstrap.concat([ this._rootComponent ]);
       }
 
-      if (this._route) {
-        _.defaults(this._route, defaultRoute);
-      }
+      this.getOrAddRoute(defaultRoute);
     } else {
       m.imports = m.imports.concat([
         CommonModule,
         // MaterialModule,
       ]);
     }
+
+    m.imports = m.imports.concat([ BizComponentsModule ]);
   }
 
   private buildFramers(framers: BizFramer<any>[]): void {
@@ -338,8 +342,8 @@ export class BizNgModule {
         return this._containers[key];
       });
 
-      m.exports = m.exports.concat(containerComponents);
-      m.declarations = m.declarations.concat(containerComponents);
+      // m.exports = m.exports.concat(containerComponents);
+      // m.declarations = m.declarations.concat(containerComponents);
     }
   }
 
@@ -347,16 +351,22 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
 
     if (this._children) {
-      m.imports = m.imports.concat(this._children);
+      this.getOrAddRoute({ path: '' }).children = this._children;
+    }
+  }
+
+  private buildComponent(): void {
+    let m: NgModule = this._ngModule;
+
+    if (this._component) {
+      m.declarations = m.declarations.concat([ this._component ]);
+
+      this.getOrAddRoute({ path: '' }).component = this._component;
     }
   }
 
   private buildRoute(): void {
     let m: NgModule = this._ngModule;
-
-    if (this._route) {
-      this._routes.unshift(this._route);
-    }
 
     if (this._routes.length > 0) {
       console.log(this._routes);
@@ -376,15 +386,19 @@ export class BizNgModule {
     }
   }
 
-  private buildComponent(): void {
-    let m: NgModule = this._ngModule;
+  private getOrAddRoute(route: Route = {}): Route {
+    _.defaults(route, { path: '' });
 
-    if (this._component) {
-      m.declarations = m.declarations.concat([ this._component ]);
+    let r = _.find(this._routes, { path: route.path });
 
-      if (this._route) {
-        this._route.component = this._component;
-      }
+    if (r) {
+      _.assign(r, route);
+
+      return r;
+    } else {
+      this._routes.push(route);
+
+      return route;
     }
   }
 }

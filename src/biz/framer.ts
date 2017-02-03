@@ -6,6 +6,8 @@ import { BizNgModule } from './ng-module';
 
 export abstract class BizFramer<C> {
 
+  public helper: any;
+
   public parent: BizFramer<any>;
 
   public sharedModule: any;
@@ -19,6 +21,10 @@ export abstract class BizFramer<C> {
   public constructor(public config?: C & BizFramerConfig<any>) {
     this.sharedModule = ng2.NgModule({}).Class({ constructor: () => {} });
     this.sharedInstanceModule = ng2.NgModule({}).Class({ constructor: () => {} });
+
+    if (config && config.helper) {
+      this.helper = new config.helper(); // (FIXME: Need to use Injector)
+    }
   }
 
   // ========================================

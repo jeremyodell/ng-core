@@ -1,17 +1,17 @@
-import { Component, ComponentFactory, ComponentRef, Input, ComponentFactoryResolver, ViewChild, ViewContainerRef} from '@angular/core';
-import { Router, ActivatedRouteSnapshot, UrlSegment, RouterState, NavigationEnd } from '@angular/router';
+import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, Input, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterState, UrlSegment } from '@angular/router';
+
+const bizContainersDataKey: string = 'bizContainers';
 
 @Component({
   selector: 'biz-container',
-  template: '<div #dynamicTarget></div>'
+  template: '<div #dynamicTarget></div>',
 })
-export class BizContainerComponent {
+export class BizContainerComponent implements OnDestroy, OnInit {
 
-  @Input()
-  public name: string;
+  @Input() public name: string;
 
-  @ViewChild('dynamicTarget', { read: ViewContainerRef })
-  private dynamicTarget: any;
+  @ViewChild('dynamicTarget', { read: ViewContainerRef }) private dynamicTarget: any;
 
   private componentFactory: ComponentFactory<any>;
 
@@ -34,24 +34,24 @@ export class BizContainerComponent {
     });
   }
 
+  public ngOnDestroy(): void {
+    this.destroyComponent();
+  }
+
   private findContainer(snapshot: ActivatedRouteSnapshot): any {
-    for (let i = 0; i < snapshot.children.length; i++) {
-      let childContainer = this.findContainer(snapshot.children[i]);
+    for (let child of snapshot.children) {
+      let childContainer = this.findContainer(child);
 
       if (childContainer) {
         return childContainer;
       }
     }
 
-    if (snapshot.data['bizContainers'] && snapshot.data['bizContainers'][this.name]) {
-      return snapshot.data['bizContainers'][this.name];
+    if (snapshot.data[bizContainersDataKey] && snapshot.data[bizContainersDataKey][this.name]) {
+      return snapshot.data[bizContainersDataKey][this.name];
     }
 
     return null;
-  }
-
-  public ngOnDestroy(): void {
-    this.destroyComponent();
   }
 
   private resetComponent(): void {
@@ -61,7 +61,7 @@ export class BizContainerComponent {
 
   private createComponent(): void {
     if (this.componentFactory) {
-      this.componentReference = this.dynamicTarget.createComponent(this.componentFactory);;
+      this.componentReference = this.dynamicTarget.createComponent(this.componentFactory);
     }
   }
 
