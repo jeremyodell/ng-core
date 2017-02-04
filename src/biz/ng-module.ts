@@ -244,7 +244,7 @@ export class BizNgModule {
    * - Component
    * - Route
    */
-  public frame(...framers: BizFramer<any>[]): NgModule {
+  public frame(...framers: BizFramer<any, any>[]): NgModule {
     if (this.isFraming) {
       this.buildFramers(framers);
     } else {
@@ -264,7 +264,7 @@ export class BizNgModule {
     return this._ngModule;
   }
 
-  public build(framers: BizFramer<any>[]): NgModule {
+  public build(framers: BizFramer<any, any>[]): NgModule {
     return this.frame.call(this, framers);
   }
 
@@ -316,17 +316,27 @@ export class BizNgModule {
     m.imports = m.imports.concat([ BizComponentsModule ]);
   }
 
-  private buildFramers(framers: BizFramer<any>[]): void {
+  private buildFramers(framers: BizFramer<any, any>[]): void {
     for (let framer of framers) {
       this.buildFramer(framer);
     }
   }
 
-  private buildFramer(framer: BizFramer<any>): void {
-    this.imports([ framer.sharedInstanceModule, framer.sharedModule ]);
+  private buildFramer(framer: BizFramer<any, any>): void {
+    this.imports([ framer.framingModule ]);
 
     if (framer.defaultConfig) {
       _.defaults(framer.config, framer.defaultConfig);
+    }
+
+    if (framer.config && framer.config.helperService) {
+      console.log('adding HelperService to provider', framer);
+      this.providers([ framer.config.helperService ]);
+    }
+
+    if (framer.framerServiceType) {
+      console.log('adding FrameService to provider', framer);
+      this.providers([ framer.framerServiceType ]);
     }
 
     framer.frame(this);
@@ -369,7 +379,7 @@ export class BizNgModule {
     let m: NgModule = this._ngModule;
 
     if (this._routes.length > 0) {
-      console.log(this._routes);
+      console.log('Routes', this._routes);
 
       let routing: ModuleWithProviders = this._root || (this._routeConfig && this._routeConfig.forRoot) ?
         RouterModule.forRoot(this._routes, this._routeConfig ? this._routeConfig.extraRootRouterOptions : undefined) :

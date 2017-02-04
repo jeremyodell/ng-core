@@ -1,30 +1,53 @@
-import * as ng2 from '@angular/core';
+import { Injector, NgModule, Type } from '@angular/core';
 import { Provider } from '@angular/core';
 
+import { Biz } from '.';
 import { BizFramerConfig } from './framer-config';
 import { BizNgModule } from './ng-module';
 
-export abstract class BizFramer<C> {
+export abstract class BizFramer<C, H> {
 
-  public helper: any;
+  public config: C;
 
-  public parent: BizFramer<any>;
+  public helperService: H;
 
-  public sharedModule: any;
+  public framerService: any;
 
-  public sharedInstanceModule: any;
+  public parent: BizFramer<any, any>;
+
+  public framingModule: any;
 
   // ========================================
   // constructor
   // ========================================
 
-  public constructor(public config?: C & BizFramerConfig<any>) {
-    this.sharedModule = ng2.NgModule({}).Class({ constructor: () => {} });
-    this.sharedInstanceModule = ng2.NgModule({}).Class({ constructor: () => {} });
+  public constructor(
+    config?: C & BizFramerConfig<H>,
+    public framerServiceType?: Type<any>,
+  ) {
+    this.config = config;
 
-    if (config && config.helper) {
-      this.helper = new config.helper(); // (FIXME: Need to use Injector)
+    const self = this;
+
+    @NgModule(Biz
+      .ngModule()
+      .frame())
+    class FramingModule {
+      constructor(private injector: Injector) {
+        console.log('constructing FramingModule for', self);
+        if (config && config.helperService) {
+          self.helperService = this.injector.get(config.helperService); // bootstrap the helper service
+          console.log('bootstraping HelperService', self.helperService);
+        }
+        if (self.framerServiceType) {
+          self.framerService = this.injector.get(self.framerServiceType); // bootstrap the framer service
+          console.log('bootstraping FramerService', self.framerService);
+        }
+        console.log('framer now looks like this:', self);
+      }
     }
+
+    this.framingModule = FramingModule;
   }
 
   // ========================================
@@ -35,7 +58,5 @@ export abstract class BizFramer<C> {
     return null;
   }
 
-  /* tslint:disable:no-empty */
   public frame(bizNgModule: BizNgModule): void {}
-  /* tslint:enable:no-empty */
 }

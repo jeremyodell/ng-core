@@ -1,3 +1,5 @@
-export interface BizFramerConfig<H> {
-  helper?: H;
+import { Type } from '@angular/core';
+
+export interface BizFramerConfig<T> {
+  helperService?: Type<T>;
 }
