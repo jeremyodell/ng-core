@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 
+import { BizClient } from './client';
 import { BizConfig } from './config';
 import { BizFramer } from './framer';
 import { BizFramerConfig } from './framer-config';
