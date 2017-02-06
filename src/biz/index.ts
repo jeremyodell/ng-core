@@ -7,6 +7,7 @@ import { BizNgModule } from './ng-module';
 import { BizTree, Tree, TreeModule } from './tree';
 
 export {
+  BizClient,
   BizConfig,
   BizFramer,
   BizFramerConfig,
